@@ -40,24 +40,24 @@ class EnvatoScraper:
             page = await context.new_page()
 
             try:
-                # Build search URL
+                # Build initial search URL
                 search_url = self._build_search_url(industry, cms, keywords)
                 print(f"🌐 Navigating to: {search_url}")
 
                 await page.goto(search_url, wait_until="networkidle", timeout=60000)
-                await asyncio.sleep(3)  # Allow JS to load
+                await asyncio.sleep(3) 
 
-                # Handle cookie consent if present
-                try:
-                    cookie_btn = await page.query_selector('button:has-text("Accept")')
-                    if cookie_btn:
-                        await cookie_btn.click()
-                        await asyncio.sleep(1)
-                except:
-                    pass
-
-                # Scroll to load more results
                 templates = await self._scroll_and_collect(page, max_results)
+
+                # Fallback: If no results, retry with just industry/category
+                if not templates and (keywords or industry):
+                    print("⚠️ No results with keywords, retrying with broader search...")
+                    # Build a broader URL (no keywords)
+                    broad_url = self._build_search_url(industry, cms, None)
+                    print(f"🌐 Navigating to broad search: {broad_url}")
+                    await page.goto(broad_url, wait_until="networkidle", timeout=60000)
+                    await asyncio.sleep(3)
+                    templates = await self._scroll_and_collect(page, max_results)
 
             except Exception as e:
                 print(f"❌ Scraping error: {e}")
@@ -70,7 +70,7 @@ class EnvatoScraper:
         self, 
         industry: Optional[str], 
         cms: Optional[str], 
-        keywords: List[str]
+        keywords: Optional[List[str]]
     ) -> str:
         """
         Construct Envato search URL with filters
@@ -92,9 +92,8 @@ class EnvatoScraper:
         url_parts = [self.base_url, category]
 
         # Add industry as subcategory if provided
-        if industry and industry != "Corporate":  # Corporate is default
+        if industry and industry != "Corporate":
             industry_slug = industry.lower().replace("/", "-").replace(" ", "-")
-            # Map common industries to Envato categories
             industry_mapping = {
                 "creative-portfolio": "portfolio",
                 "e-commerce": "ecommerce",
@@ -112,7 +111,11 @@ class EnvatoScraper:
         # Add query parameters
         params = []
         if keywords and len(keywords) > 0:
-            query = quote(" ".join(keywords[:3]))  # Limit to 3 keywords
+            # Use only the top 2-3 single-word keywords for max compatibility
+            clean_keywords = [k for k in keywords if " " not in k][:3]
+            if not clean_keywords: clean_keywords = keywords[:2]
+            
+            query = quote(" ".join(clean_keywords))
             params.append(f"query={query}")
 
         # Add sorting
