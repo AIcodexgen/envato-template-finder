@@ -1,10 +1,4 @@
-FROM python:3.11-slim
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    wget \
-    gnupg \
-    && rm -rf /var/lib/apt/lists/*
+FROM mcr.microsoft.com/playwright/python:v1.40.0-jammy
 
 # Set working directory
 WORKDIR /app
@@ -13,13 +7,15 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install Playwright browsers and their system dependencies
-RUN playwright install --with-deps chromium
+# Playwright browsers are pre-installed in this image.
+# We run install chromium just to ensure it matches the package version if needed.
+RUN playwright install chromium
 
 # Copy application code
 COPY . .
 
 # Create non-root user for security
+# The official image might have a pwuser, but creating our own is fine.
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
 USER appuser
 
