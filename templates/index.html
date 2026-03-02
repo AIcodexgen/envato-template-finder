@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Envato Template Finder AI | Find Similar Website Templates</title>
+    <meta name="description" content="AI-powered tool to find similar templates on Envato Elements based on any reference website">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --dark: #1a202c;
+            --light: #f7fafc;
+            --gray: #718096;
+            --success: #48bb78;
+            --warning: #ed8936;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        /* Main Card */
+        .main-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+            overflow: hidden;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.8s ease 0.4s both;
+        }
+
+        .input-section {
+            padding: 50px;
+            background: linear-gradient(to bottom, #ffffff, #f8fafc);
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--dark);
+            font-size: 1.1em;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input[type="url"],
+        select {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        input[type="url"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-hint {
+            font-size: 0.9em;
+            color: var(--gray);
+            margin-top: 8px;
+        }
+
+        /* Filters Grid */
+        .filters-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .filter-box {
+            background: #f7fafc;
+            padding: 25px;
+            border-radius: 16px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s;
+        }
+
+        .filter-box:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .filter-box label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .filter-icon {
+            font-size: 1.3em;
+        }
+
+        /* Button */
+        .btn-container {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            font-size: 1.2em;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+
+        .btn.loading .btn-spinner {
+            display: inline-block;
+        }
+
+        .btn.loading .btn-text {
+            display: none;
+        }
+
+        /* Loading State */
+        .loading-container {
+            display: none;
+            text-align: center;
+            padding: 80px 40px;
+            background: white;
+        }
+
+        .loading-container.active {
+            display: block;
+        }
+
+        .loading-animation {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 40px;
+        }
+
+        .loading-circle {
+            position: absolute;
+            border: 4px solid transparent;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-circle:nth-child(1) {
+            width: 120px;
+            height: 120px;
+            top: 0;
+            left: 0;
+            animation-duration: 1.5s;
+        }
+
+        .loading-circle:nth-child(2) {
+            width: 90px;
+            height: 90px;
+            top: 15px;
+            left: 15px;
+            animation-duration: 1s;
+            border-top-color: var(--secondary);
+        }
+
+        .loading-circle:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            top: 30px;
+            left: 30px;
+            animation-duration: 0.8s;
+            border-top-color: var(--accent);
+        }
+
+        .loading-text {
+            font-size: 1.5em;
+            color: var(--dark);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .loading-subtext {
+            color: var(--gray);
+            font-size: 1.1em;
+        }
+
+        .loading-steps {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gray);
+            font-size: 0.95em;
+        }
+
+        .step.active {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .step.completed {
+            color: var(--success);
+        }
+
+        .step-icon {
+            font-size: 1.2em;
+        }
+
+        /* Results Section */
+        .results-container {
+            display: none;
+            padding: 50px;
+            background: #f8fafc;
+        }
+
+        .results-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Analysis Card */
+        .analysis-card {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border-left: 5px solid var(--primary);
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 40px;
+            display: flex;
+            gap: 25px;
+            align-items: flex-start;
+        }
+
+        .analysis-icon {
+            font-size: 2.5em;
+            flex-shrink: 0;
+        }
+
+        .analysis-content h3 {
+            color: var(--primary-dark);
+            margin-bottom: 12px;
+            font-size: 1.3em;
+        }
+
+        .analysis-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .analysis-badge {
+            background: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            color: var(--dark);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .analysis-badge strong {
+            color: var(--primary);
+        }
+
+        /* Results Header */
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .results-title {
+            font-size: 1.8em;
+            color: var(--dark);
+        }
+
+        .results-count {
+            background: var(--primary);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        /* Template Grid */
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .template-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            border: 1px solid #e2e8f0;
+            position: relative;
+        }
+
+        .template-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .rank-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.2em;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4);
+            z-index: 10;
+        }
+
+        .template-image-container {
+            position: relative;
+            height: 220px;
+            overflow: hidden;
+            background: #f0f0f0;
+        }
+
+        .template-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .template-card:hover .template-image {
+            transform: scale(1.05);
+        }
+
+        .similarity-score {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.95);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .template-content {
+            padding: 25px;
+        }
+
+        .template-title {
+            font-size: 1.25em;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .template-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .template-tag {
+            background: #edf2f7;
+            color: var(--gray);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        .match-reasons {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .match-reasons h4 {
+            font-size: 0.9em;
+            color: var(--gray);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .reason-list {
+            list-style: none;
+        }
+
+        .reason-list li {
+            padding: 8px 0;
+            padding-left: 28px;
+            position: relative;
+            font-size: 0.95em;
+            color: #4a5568;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .reason-list li:last-child {
+            border-bottom: none;
+        }
+
+        .reason-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: 700;
+            width: 20px;
+            height: 20px;
+            background: rgba(72, 187, 120, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+        }
+
+        .reason-category {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .btn-view {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-top: 15px;
+        }
+
+        .btn-view:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Error Message */
+        .error-container {
+            display: none;
+            background: #fed7d7;
+            border-left: 5px solid #f56565;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 30px;
+            color: #c53030;
+        }
+
+        .error-container.active {
+            display: block;
+            animation: shake 0.5s ease;
+        }
+
+        .error-title {
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .input-section,
+            .results-container {
+                padding: 30px 20px;
+            }
+
+            .template-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .analysis-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .loading-steps {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-4 {
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>🎨 Envato Template Finder AI</h1>
+            <p>Enter any website URL and our AI will find the most similar templates on Envato Elements</p>
+        </header>
+
+        <!-- Main Card -->
+        <div class="main-card">
+            <!-- Input Section -->
+            <div class="input-section" id="inputSection">
+                <div class="form-group">
+                    <label for="referenceUrl">🔗 Reference Website URL</label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="url" 
+                            id="referenceUrl" 
+                            placeholder="https://example.com" 
+                            required
+                            autocomplete="url"
+                        >
+                    </div>
+                    <p class="input-hint">Enter the website you want to find similar templates for</p>
+                </div>
+
+                <div class="filters-grid">
+                    <div class="filter-box">
+                        <label for="industry">
+                            <span class="filter-icon">🏢</span>
+                            Industry (Optional)
+                        </label>
+                        <select id="industry">
+                            <option value="">🤖 Auto-detect</option>
+                            <option value="Corporate">🏢 Corporate</option>
+                            <option value="Creative/Portfolio">🎨 Creative/Portfolio</option>
+                            <option value="E-commerce">🛒 E-commerce</option>
+                            <option value="Education">📚 Education</option>
+                            <option value="Entertainment">🎬 Entertainment</option>
+                            <option value="Fashion">👗 Fashion</option>
+                            <option value="Food/Restaurant">🍔 Food/Restaurant</option>
+                            <option value="Health/Beauty">💆 Health/Beauty</option>
+                            <option value="Medical">🏥 Medical</option>
+                            <option value="Real Estate">🏠 Real Estate</option>
+                            <option value="SaaS/Technology">💻 SaaS/Technology</option>
+                            <option value="Sports">⚽ Sports</option>
+                            <option value="Travel">✈️ Travel</option>
+                            <option value="Non-profit">💚 Non-profit</option>
+                            <option value="Blog/Magazine">📝 Blog/Magazine</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-box">
+                        <label for="cms">
+                            <span class="filter-icon">⚙️</span>
+                            CMS/Platform (Optional)
+                        </label>
+                        <select id="cms">
+                            <option value="">🤖 Auto-detect</option>
+                            <option value="WordPress">📝 WordPress</option>
+                            <option value="HTML/CSS">📄 HTML/CSS</option>
+                            <option value="React">⚛️ React</option>
+                            <option value="Vue.js">💚 Vue.js</option>
+                            <option value="Angular">🅰️ Angular</option>
+                            <option value="Shopify">🛍️ Shopify</option>
+                            <option value="Webflow">🌊 Webflow</option>
+                            <option value="Joomla">📰 Joomla</option>
+                            <option value="Next.js">▶️ Next.js</option>
+                            <option value="Nuxt.js">🟢 Nuxt.js</option>
+                            <option value="Laravel">🚀 Laravel</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <button class="btn" id="searchBtn" onclick="searchTemplates()">
+                        <span class="btn-spinner"></span>
+                        <span class="btn-text">
+                            🔍 Find Similar Templates
+                        </span>
+                    </button>
+                </div>
+
+                <div class="error-container" id="errorContainer">
+                    <div class="error-title">
+                        <span>⚠️</span>
+                        <span>Error</span>
+                    </div>
+                    <div id="errorMessage"></div>
+                </div>
+            </div>
+
+            <!-- Loading Section -->
+            <div class="loading-container" id="loadingContainer">
+                <div class="loading-animation">
+                    <div class="loading-circle"></div>
+                    <div class="loading-circle"></div>
+                    <div class="loading-circle"></div>
+                </div>
+                <div class="loading-text">Analyzing Website & Finding Templates...</div>
+                <div class="loading-subtext">This usually takes 30-60 seconds</div>
+
+                <div class="loading-steps">
+                    <div class="step active" id="step1">
+                        <span class="step-icon">🔍</span>
+                        <span>Analyzing Reference Site</span>
+                    </div>
+                    <div class="step" id="step2">
+                        <span class="step-icon">🌐</span>
+                        <span>Scraping Envato Elements</span>
+                    </div>
+                    <div class="step" id="step3">
+                        <span class="step-icon">🤖</span>
+                        <span>AI Matching</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-container" id="resultsContainer">
+                <!-- Analysis Summary -->
+                <div class="analysis-card">
+                    <div class="analysis-icon">📊</div>
+                    <div class="analysis-content">
+                        <h3>Website Analysis Complete</h3>
+                        <p id="analysisSummary">Analysis summary will appear here...</p>
+                        <div class="analysis-details" id="analysisDetails">
+                            <!-- Dynamic badges will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Header -->
+                <div class="results-header">
+                    <h2 class="results-title">🎯 Top Similar Templates</h2>
+                    <span class="results-count" id="resultsCount">10 matches</span>
+                </div>
+
+                <!-- Template Grid -->
+                <div class="template-grid" id="templateGrid">
+                    <!-- Template cards will be inserted here -->
+                </div>
+
+                <div class="text-center mt-4">
+                    <button class="btn" onclick="resetSearch()">
+                        🔄 Search Again
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer style="text-align: center; color: rgba(255,255,255,0.8); padding: 20px;">
+            <p>Powered by AI • Built with FastAPI & Playwright</p>
+        </footer>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_BASE = window.location.origin;
+
+        // State management
+        let isSearching = false;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlInput = document.getElementById('referenceUrl');
+            urlInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    searchTemplates();
+                }
+            });
+        });
+
+        async function searchTemplates() {
+            if (isSearching) return;
+
+            const url = document.getElementById('referenceUrl').value.trim();
+            const industry = document.getElementById('industry').value;
+            const cms = document.getElementById('cms').value;
+
+            // Validation
+            if (!url) {
+                showError('Please enter a reference website URL');
+                return;
+            }
+
+            // Basic URL validation
+            let processedUrl = url;
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                processedUrl = 'https://' + url;
+            }
+
+            try {
+                new URL(processedUrl);
+            } catch {
+                showError('Please enter a valid URL (e.g., https://example.com)');
+                return;
+            }
+
+            // Start search
+            isSearching = true;
+            setLoadingState(true);
+            hideError();
+
+            // Update steps
+            updateStep(1, 'active');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/search-templates`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        reference_url: processedUrl,
+                        industry: industry || null,
+                        cms: cms || null,
+                        max_results: 10
+                    })
+                });
+
+                // Update steps
+                updateStep(1, 'completed');
+                updateStep(2, 'completed');
+                updateStep(3, 'completed');
+
+                await new Promise(resolve => setTimeout(resolve, 500)); // Brief pause for UX
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Search failed. Please try again.');
+                }
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error('Search was not successful');
+                }
+
+                displayResults(data);
+
+            } catch (error) {
+                console.error('Search error:', error);
+                showError(error.message || 'An unexpected error occurred. Please try again.');
+                setLoadingState(false);
+            } finally {
+                isSearching = false;
+            }
+        }
+
+        function setLoadingState(loading) {
+            const btn = document.getElementById('searchBtn');
+            const inputSection = document.getElementById('inputSection');
+            const loadingContainer = document.getElementById('loadingContainer');
+            const resultsContainer = document.getElementById('resultsContainer');
+
+            if (loading) {
+                btn.classList.add('loading');
+                btn.disabled = true;
+                inputSection.style.display = 'none';
+                loadingContainer.classList.add('active');
+                resultsContainer.classList.remove('active');
+            } else {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+                loadingContainer.classList.remove('active');
+            }
+        }
+
+        function updateStep(stepNumber, status) {
+            const step = document.getElementById(`step${stepNumber}`);
+            if (step) {
+                step.className = 'step ' + status;
+            }
+        }
+
+        function displayResults(data) {
+            setLoadingState(false);
+
+            const resultsContainer = document.getElementById('resultsContainer');
+            resultsContainer.classList.add('active');
+
+            // Update analysis summary
+            document.getElementById('analysisSummary').textContent = data.reference_summary;
+
+            // Update analysis details badges
+            const detailsContainer = document.getElementById('analysisDetails');
+            detailsContainer.innerHTML = '';
+
+            if (data.detected_industry) {
+                addBadge(detailsContainer, '🏢', 'Industry', data.detected_industry);
+            }
+            if (data.detected_cms) {
+                addBadge(detailsContainer, '⚙️', 'Platform', data.detected_cms);
+            }
+
+            // Update results count
+            const matchCount = data.top_matches ? data.top_matches.length : 0;
+            document.getElementById('resultsCount').textContent = `${matchCount} matches found`;
+
+            // Generate template cards
+            const grid = document.getElementById('templateGrid');
+            grid.innerHTML = '';
+
+            if (!data.top_matches || data.top_matches.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: var(--gray);">
+                        <div style="font-size: 3em; margin-bottom: 20px;">😕</div>
+                        <h3>No templates found</h3>
+                        <p>Try adjusting your filters or using a different reference website.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            data.top_matches.forEach((match, index) => {
+                const card = createTemplateCard(match, index + 1);
+                grid.appendChild(card);
+            });
+
+            // Scroll to results
+            resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function addBadge(container, icon, label, value) {
+            const badge = document.createElement('div');
+            badge.className = 'analysis-badge';
+            badge.innerHTML = `${icon} <strong>${label}:</strong> ${value}`;
+            container.appendChild(badge);
+        }
+
+        function createTemplateCard(match, rank) {
+            const card = document.createElement('div');
+            card.className = 'template-card';
+
+            const reasons = match.match_reasons || {};
+            const reasonList = Object.entries(reasons)
+                .map(([key, value]) => {
+                    const categoryNames = {
+                        visual: 'Visual Design',
+                        layout: 'Layout Structure',
+                        industry: 'Industry Fit',
+                        features: 'Features'
+                    };
+                    return `
+                        <li>
+                            <span class="reason-category">${categoryNames[key] || key}:</span> 
+                            ${value}
+                        </li>
+                    `;
+                })
+                .join('');
+
+            const tags = match.tags || [];
+            const tagsHtml = tags.slice(0, 3).map(tag => 
+                `<span class="template-tag">${escapeHtml(tag)}</span>`
+            ).join('');
+
+            const imageUrl = match.preview_image || 'https://via.placeholder.com/400x300?text=No+Preview';
+
+            card.innerHTML = `
+                <div class="template-image-container">
+                    <img 
+                        src="${escapeHtml(imageUrl)}" 
+                        alt="${escapeHtml(match.title)}" 
+                        class="template-image"
+                        onerror="this.src='https://via.placeholder.com/400x300?text=Preview+Not+Available'"
+                        loading="lazy"
+                    >
+                    <div class="rank-badge">${rank}</div>
+                    <div class="similarity-score">${match.similarity_score}% Match</div>
+                </div>
+                <div class="template-content">
+                    <h3 class="template-title">${escapeHtml(match.title)}</h3>
+                    <div class="template-tags">${tagsHtml}</div>
+
+                    <div class="match-reasons">
+                        <h4>Why this matches</h4>
+                        <ul class="reason-list">
+                            ${reasonList || '<li>No specific details available</li>'}
+                        </ul>
+                    </div>
+
+                    <a href="${escapeHtml(match.envato_url)}" target="_blank" rel="noopener" class="btn-view">
+                        View on Envato Elements →
+                    </a>
+                </div>
+            `;
+
+            return card;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showError(message) {
+            const container = document.getElementById('errorContainer');
+            const messageEl = document.getElementById('errorMessage');
+            messageEl.textContent = message;
+            container.classList.add('active');
+
+            // Scroll to error
+            container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function hideError() {
+            const container = document.getElementById('errorContainer');
+            container.classList.remove('active');
+        }
+
+        function resetSearch() {
+            // Reset form
+            document.getElementById('referenceUrl').value = '';
+            document.getElementById('industry').value = '';
+            document.getElementById('cms').value = '';
+
+            // Hide results, show input
+            document.getElementById('resultsContainer').classList.remove('active');
+            document.getElementById('inputSection').style.display = 'block';
+
+            // Reset steps
+            [1, 2, 3].forEach(i => updateStep(i, ''));
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
