@@ -18,10 +18,9 @@ RUN playwright install chromium
 # Copy application code
 COPY . .
 
-# Create non-root user for security
-# The official image might have a pwuser, but creating our own is fine.
-RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
-USER appuser
+# Use the built-in pwuser provided by the Playwright image
+RUN chown -R pwuser:pwuser /app
+USER pwuser
 
 # Expose port
 EXPOSE 8000
