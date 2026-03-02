@@ -1,5 +1,9 @@
 FROM mcr.microsoft.com/playwright/python:v1.40.0-jammy
 
+# Set environment variables to suppress pip warnings
+ENV PIP_ROOT_USER_ACTION=ignore \
+    PYTHONUNBUFFERED=1
+
 # Set working directory
 WORKDIR /app
 
