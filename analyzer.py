@@ -224,23 +224,44 @@ class ReferenceAnalyzer:
         """
         # Get headings and important text
         headings = soup.find_all(['h1', 'h2', 'h3'])
-        keywords = []
+        raw_terms = []
 
         for h in headings:
-            text = h.get_text(strip=True)
-            # Filter out short or long text, and common words
-            if 5 < len(text) < 60:
-                # Clean up text
-                clean_text = re.sub(r'[^\w\s-]', '', text)
-                if clean_text and not any(word in clean_text.lower() for word in ['home', 'about', 'contact', 'menu']):
-                    keywords.append(clean_text)
+            text = h.get_text(strip=True).lower()
+            if 3 < len(text) < 100:
+                # Clean up text - remove special characters
+                clean_text = re.sub(r'[^\w\s]', ' ', text)
+                raw_terms.extend(clean_text.split())
 
-        # Also get keywords from meta
+        # Also get from meta keywords
         meta_keywords = soup.find('meta', attrs={'name': 'keywords'})
         if meta_keywords:
-            keywords.extend(meta_keywords.get('content', '').split(','))
+            raw_terms.extend(re.sub(r'[^\w\s]', ' ', meta_keywords.get('content', '').lower()).split())
 
-        return list(set(keywords))[:8]  # Return unique, limit to 8
+        # Also get from title
+        if soup.title:
+            raw_terms.extend(re.sub(r'[^\w\s]', ' ', soup.title.string.lower()).split())
+
+        # Stop words to filter out
+        stop_words = {
+            'home', 'about', 'contact', 'menu', 'page', 'site', 'website', 
+            'log', 'in', 'into', 'your', 'account', 'footer', 'navigation',
+            'options', 'the', 'and', 'for', 'with', 'from', 'our', 'business',
+            'administration', 'search', 'toggle', 'main', 'skip', 'content'
+        }
+
+        # Filter and count frequencies
+        keywords = []
+        for word in raw_terms:
+            if len(word) > 3 and word not in stop_words and not word.isdigit():
+                keywords.append(word)
+
+        # Count frequencies and get top 8
+        from collections import Counter
+        most_common = [word for word, count in Counter(keywords).most_common(12)]
+        
+        print(f"🔑 Refined keywords: {most_common}")
+        return most_common
 
     async def _extract_colors(self, screenshot_bytes: bytes) -> List[str]:
         """
